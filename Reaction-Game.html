@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Reaction Tap Game</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+</head>
+<body>
+
+<script>
+let state = "idle";
+let startTime = 0;
+let reactionMs = 0;
+let bestMs = null;
+let waitUntil = 0;
+
+function setup() {
+  createCanvas(700, 420);
+  textFont("Arial");
+}
+
+function startRound() {
+  state = "waiting";
+  waitUntil = millis() + random(1500, 5000);
+}
+
+function draw() {
+  if (state === "idle") {
+    background(25, 25, 35);
+    drawText("Click to Start\n\nWait for GREEN\nClick FAST!", 32);
+  }
+
+  else if (state === "waiting") {
+    background(180, 60, 60);
+    drawText("WAIT...", 50);
+    if (millis() >= waitUntil) {
+      state = "go";
+      startTime = millis();
+    }
+  }
+
+  else if (state === "go") {
+    background(60, 180, 90);
+    drawText("CLICK NOW!", 60);
+  }
+
+  else if (state === "result") {
+    background(30);
+    let bestText = bestMs ? bestMs + " ms" : "--";
+    drawText("Your Time: " + reactionMs + " ms\nBest: " + bestText + "\n\nClick to Play Again", 32);
+  }
+
+  else if (state === "cheated") {
+    background(50);
+    drawText("Too Early 😭\nClick to Try Again", 40);
+  }
+}
+
+function mousePressed() {
+  if (state === "idle") startRound();
+  else if (state === "waiting") state = "cheated";
+  else if (state === "go") {
+    reactionMs = millis() - startTime;
+    if (!bestMs || reactionMs < bestMs) bestMs = reactionMs;
+    state = "result";
+  }
+  else startRound();
+}
+
+function drawText(msg, size) {
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textSize(size);
+  text(msg, width / 2, height / 2);
+}
+</script>
+
+</body>
+</html>S
